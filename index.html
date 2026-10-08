@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>真。光頭王 SSR VII ｜ 傳奇 3D 鐳射動態反光卡牌</title>
+  <meta name="description" content="真。光頭王 SSR VII 個人專屬 3D 鐳射動態反光卡牌展示網頁，具備陀螺儀體感連動、全息雷射箔膜切換、實時卡面編輯與超高解析度 PNG 匯出。">
+
+  <!-- Google Fonts: 頂級 TCG 視覺字型 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Noto+Sans+TC:wght@400;600;700;900&family=Orbitron:wght@700;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+
+  <!-- html2canvas: 支援免依賴一鍵匯出超高解析卡牌圖檔 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <style>
+    /* ==========================================================================
+       1. 全域重設與主題核心變數 (CSS Custom Properties)
+       ========================================================================== */
+    :root {
+      --bg-dark: #0a0709;
+      --bg-gradient: radial-gradient(circle at 50% 20%, #2b0c0a 0%, #120606 50%, #050203 100%);
+      --fire-primary: #ff3b14;
+      --fire-secondary: #ff8c00;
+      --fire-gold: #ffd700;
+      --fire-glow: rgba(255, 60, 20, 0.45);
+      --molten-border: linear-gradient(135deg, #ffd700 0%, #ff4500 35%, #8b0000 70%, #ffae19 100%);
+      --glass-bg: rgba(20, 12, 14, 0.72);
+      --glass-border: rgba(255, 120, 50, 0.25);
+      --glass-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+      --font-display: 'Cinzel', 'Noto Sans TC', serif;
+      --font-tech: 'Orbitron', 'Rajdhani', sans-serif;
+      --font-body: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      background: var(--bg-dark);
+      background-image: var(--bg-gradient);
+      color: #f5e6d3;
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 1.5rem 1rem 3rem;
+      position: relative;
+    }
+
+    /* 背景熔岩粒子流動氛圍 */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: 
+        radial-gradient(1.5px 1.5px at 20% 30%, rgba(255, 140, 0, 0.6), transparent),
+        radial-gradient(2px 2px at 80% 40%, rgba(255, 50, 0, 0.7), transparent),
+        radial-gradient(1.5px 1.5px at 40% 70%, rgba(255, 215, 0, 0.5), transparent),
+        radial-gradient(2.5px 2.5px at 65% 85%, rgba(255, 80, 20, 0.6), transparent);
+      background-size: 500px 500px;
+      animation: emberFloat 20s linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes emberFloat {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-500px); }
+    }
+
+    /* ==========================================================================
+       2. 頂部儀表板與標題區
+       ========================================================================== */
+    header.site-header {
+      width: 100%;
+      max-width: 1280px;
+      margin-bottom: 2rem;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 69, 0, 0.15);
+      border: 1px solid rgba(255, 140, 0, 0.4);
+      padding: 0.35rem 1.1rem;
+      border-radius: 999px;
+      font-family: var(--font-tech);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      color: #ffa040;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+      box-shadow: 0 0 15px rgba(255, 60, 0, 0.25);
+    }
+
+    .badge-pill::before {
+      content: '✦';
+      color: #ffd700;
+      animation: pulseSparkle 1.8s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulseSparkle {
+      0% { transform: scale(0.9); opacity: 0.6; }
+      100% { transform: scale(1.3); opacity: 1; filter: drop-shadow(0 0 6px #ffd700); }
+    }
+
+    .site-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      background: linear-gradient(135deg, #fff2dc 0%, #ffd080 40%, #ff4b1f 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 4px 15px rgba(255, 69, 0, 0.4));
+      margin-bottom: 0.3rem;
+    }
+
+    .site-subtitle {
+      font-size: clamp(0.85rem, 1.8vw, 1rem);
+      color: #c9a896;
+      letter-spacing: 0.08em;
+    }
+
+    /* ==========================================================================
+       3. 核心雙欄佈局 (RWD 架構)
+       ========================================================================== */
+    main.foundry-container {
+      width: 100%;
+      max-width: 1280px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    @media (min-width: 1024px) {
+      main.foundry-container {
+        grid-template-columns: 1fr 1fr;
+        gap: 3.5rem;
+        align-items: center;
+        min-height: calc(100vh - 180px);
+      }
+    }
+
+    /* ==========================================================================
+       4. 左側：3D 卡牌視差舞台 (Stage & Viewport)
+       ========================================================================== */
+    .card-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      perspective: 1200px;
+      position: relative;
+      padding: 1.5rem 0;
+      width: 100%;
+    }
+
+    /* 舞台下方能量投影底座 */
+    .stage-pedestal {
+      position: absolute;
+      bottom: -15px;
+      width: 280px;
+      height: 45px;
+      background: radial-gradient(ellipse at center, rgba(255, 69, 0, 0.55) 0%, rgba(255, 140, 0, 0.2) 45%, transparent 75%);
+      border-radius: 50%;
+      filter: blur(8px);
+      pointer-events: none;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    /* TCG 標準卡牌外容器 (63 : 88 比例) */
+    .card-wrapper {
+      position: relative;
+      width: min(88vw, 380px);
+      aspect-ratio: 63 / 88;
+      border-radius: 20px;
+      transform-style: preserve-3d;
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+      transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+      z-index: 2;
+    }
+
+    .card-wrapper:active {
+      cursor: grabbing;
+    }
+
+    /* 卡牌主實體 (支援 3D 雙面翻轉) */
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 20px;
+      transform-style: preserve-3d;
+      transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.85),
+        0 0 35px rgba(255, 69, 0, 0.35);
+    }
+
+    /* 卡牌翻轉狀態 */
+    .card-wrapper.is-flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    /* 正面與背面共用設定 */
+    .card-face {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 20px;
+      backface-visibility: hidden;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      background: #11090a;
+      border: 3px solid #ffaa33;
+      border-image: var(--molten-border) 1;
+    }
+
+    /* ==========================================================================
+       5. 卡牌正面結構與 FGO 戰士視覺
+       ========================================================================== */
+    .card-front {
+      z-index: 2;
+      transform: rotateY(0deg);
+    }
+
+    /* 內層立體浮雕邊框線 */
+    .card-frame {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      border: 1.5px solid rgba(255, 215, 0, 0.4);
+      border-radius: 14px;
+      background: linear-gradient(180deg, #1f0b09 0%, #150606 50%, #0d0404 100%);
+      padding: 8px 10px 8px;
+      overflow: hidden;
+      z-index: 3;
+    }
+
+    /* 頂部資訊列：階級、名稱、屬性與 HP */
+    .card-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+      position: relative;
+      z-index: 5;
+    }
+
+    .card-rank-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: linear-gradient(135deg, #ffd700 0%, #ff5500 100%);
+      color: #120300;
+      font-family: var(--font-tech);
+      font-size: 0.65rem;
+      font-weight: 900;
+      padding: 2px 7px;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
+      box-shadow: 0 0 10px rgba(255, 170, 0, 0.6);
+    }
+
+    .card-title-group {
+      flex: 1;
+      margin-left: 8px;
+      overflow: hidden;
+    }
+
+    .card-name {
+      font-family: var(--font-display);
+      font-size: clamp(0.95rem, 3.2cqw, 1.35rem);
+      font-weight: 900;
+      color: #fff6e8;
+      letter-spacing: 0.04em;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.9), 0 0 10px rgba(255, 100, 0, 0.7);
+      white-space: nowrap;
+      outline: none;
+    }
+
+    .card-hp-group {
+      display: flex;
+      align-items: baseline;
+      gap: 3px;
+      font-family: var(--font-tech);
+    }
+
+    .hp-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #ff9d66;
+    }
+
+    .hp-value {
+      font-size: clamp(1rem, 3.4cqw, 1.35rem);
+      font-weight: 900;
+      color: #ff3b14;
+      text-shadow: 0 0 12px rgba(255, 60, 20, 0.9);
+      outline: none;
+    }
+
+    .type-orb {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #fff 0%, #ff6b1a 45%, #8a0c00 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      box-shadow: 0 0 8px rgba(255, 80, 0, 0.8), inset 0 0 3px #ffd700;
+      margin-left: 5px;
+      flex-shrink: 0;
+    }
+
+    /* 插畫展示視窗 (Art Display) */
+    .art-viewport {
+      position: relative;
+      width: 100%;
+      height: 44%;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1.5px solid rgba(255, 180, 50, 0.6);
+      box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.8), 0 4px 15px rgba(0,0,0,0.6);
+      background: #000;
+      margin-bottom: 6px;
+      z-index: 4;
+    }
+
+    .art-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 25%;
+      transition: transform 0.4s ease;
+      display: block;
+    }
+
+    /* 插畫內部光暈與 FGO 階級浮印 */
+    .art-overlay-gradient {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 60%, rgba(20, 5, 5, 0.85) 100%);
+      pointer-events: none;
+    }
+
+    .art-class-emblem {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: rgba(10, 3, 3, 0.7);
+      border: 1px solid #ffd700;
+      color: #ffd700;
+      font-family: var(--font-tech);
+      font-size: 0.55rem;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      box-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+      pointer-events: none;
+    }
+
+    /* 能力與招式區塊 (Moves & Traits Container) */
+    .card-skills-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      gap: 4px;
+      position: relative;
+      z-index: 5;
+    }
+
+    /* 被動特性 (Passive Trait) */
+    .skill-trait {
+      background: rgba(45, 15, 15, 0.65);
+      border-left: 3px solid #ff4500;
+      border-radius: 4px;
+      padding: 3px 6px;
+      backdrop-filter: blur(4px);
+    }
+
+    .trait-header {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 1px;
+    }
+
+    .trait-tag {
+      background: linear-gradient(90deg, #ff4500, #b22222);
+      color: #fff;
+      font-size: 0.55rem;
+      font-weight: 800;
+      padding: 1px 4px;
+      border-radius: 2px;
+      letter-spacing: 0.05em;
+    }
+
+    .trait-name {
+      font-weight: 700;
+      font-size: 0.7rem;
+      color: #ffd29d;
+      outline: none;
+    }
+
+    .trait-desc {
+      font-size: 0.62rem;
+      line-height: 1.25;
+      color: #ded0c3;
+      outline: none;
+    }
+
+    /* 招式一 (Normal Attack) */
+    .skill-attack {
+      display: flex;
+      flex-direction: column;
+      padding: 3px 4px;
+      border-bottom: 1px dashed rgba(255, 100, 30, 0.25);
+    }
+
+    .attack-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .attack-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .energy-cost {
+      display: flex;
+      gap: 2px;
+    }
+
+    .energy-dot {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.55rem;
+      box-shadow: 0 0 5px rgba(255, 80, 0, 0.6);
+    }
+
+    .energy-fire {
+      background: radial-gradient(circle at 35% 35%, #fff 0%, #ff5500 60%, #8b0000 100%);
+    }
+
+    .energy-colorless {
+      background: radial-gradient(circle at 35% 35%, #fff 0%, #9e9e9e 60%, #424242 100%);
+    }
+
+    .attack-name {
+      font-weight: 800;
+      font-size: 0.78rem;
+      color: #fff1dc;
+      outline: none;
+    }
+
+    .attack-dmg {
+      font-family: var(--font-tech);
+      font-weight: 900;
+      font-size: 0.95rem;
+      color: #ff9100;
+      text-shadow: 0 0 8px rgba(255, 145, 0, 0.7);
+      outline: none;
+    }
+
+    .attack-desc {
+      font-size: 0.6rem;
+      line-height: 1.25;
+      color: #d1bfb0;
+      margin-top: 1px;
+      outline: none;
+    }
+
+    /* 奧義絕技 (Ultimate Art) */
+    .skill-ultimate {
+      background: radial-gradient(ellipse at center, rgba(139, 0, 0, 0.5) 0%, rgba(20, 5, 5, 0.75) 100%);
+      border: 1px solid rgba(255, 215, 0, 0.5);
+      border-radius: 5px;
+      padding: 4px 6px;
+      position: relative;
+      box-shadow: 0 0 10px rgba(255, 50, 0, 0.35);
+    }
+
+    .ultimate-title-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .ultimate-badge {
+      background: linear-gradient(90deg, #ffd700, #ff4500);
+      color: #000;
+      font-family: var(--font-tech);
+      font-weight: 900;
+      font-size: 0.55rem;
+      padding: 1px 4px;
+      border-radius: 2px;
+    }
+
+    .ultimate-name {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 0.8rem;
+      color: #fff9ed;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+      outline: none;
+      flex: 1;
+      margin-left: 5px;
+    }
+
+    .ultimate-dmg {
+      font-family: var(--font-tech);
+      font-weight: 900;
+      font-size: 1.05rem;
+      color: #ffd700;
+      text-shadow: 0 0 12px rgba(255, 215, 0, 0.9);
+      outline: none;
+    }
+
+    .ultimate-desc {
+      font-size: 0.6rem;
+      line-height: 1.25;
+      color: #f7e6d4;
+      margin-top: 2px;
+      outline: none;
+    }
+
+    /* 對抗機制列 (Weakness, Resistance, Retreat) */
+    .card-combat-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      text-align: center;
+      padding: 4px 0 2px;
+      margin-top: 2px;
+      border-top: 1px solid rgba(255, 140, 0, 0.25);
+      font-size: 0.58rem;
+      color: #bfa693;
+      position: relative;
+      z-index: 5;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1px;
+    }
+
+    .stat-title {
+      font-size: 0.52rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-value {
+      font-family: var(--font-tech);
+      font-weight: 700;
+      font-size: 0.65rem;
+      color: #ffd8a8;
+      outline: none;
+    }
+
+    /* 防偽印記與版權署名列 (Footer Bar) */
+    .card-footer-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding-top: 3px;
+      border-top: 1px solid rgba(255, 215, 0, 0.3);
+      font-size: 0.52rem;
+      color: #a89080;
+      position: relative;
+      z-index: 5;
+    }
+
+    .footer-left {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .footer-right {
+      text-align: right;
+    }
+
+    .illus-name, .card-serial, .card-copyright {
+      outline: none;
+    }
+
+    .hologram-seal {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background: linear-gradient(135deg, #ffd700, #ff3b14, #00ffff);
+      border-radius: 50%;
+      margin-left: 3px;
+      vertical-align: middle;
+      box-shadow: 0 0 5px rgba(255, 215, 0, 0.8);
+    }
+
+    /* ==========================================================================
+       6. 3D 鐳射箔膜核心系統 (Holographic Foil & Glare Engines)
+       ========================================================================== */
+    /* 鏡面高光斑層 (Specular Glare) */
+    .card-glare {
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      pointer-events: none;
+      z-index: 10;
+      mix-blend-mode: color-dodge;
+      opacity: var(--card-opacity, 0);
+      background: radial-gradient(
+        circle 220px at var(--pointer-x, 50%) var(--pointer-y, 50%),
+        rgba(255, 255, 255, 0.85) 0%,
+        rgba(255, 200, 150, 0.3) 40%,
+        transparent 80%
+      );
+      transition: opacity 0.25s ease;
+    }
+
+    /* 多風格鐳射全息層 (Holo Overlay Layer) */
+    .card-holo {
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      pointer-events: none;
+      z-index: 9;
+      opacity: var(--card-opacity, 0);
+      transition: opacity 0.25s ease;
+      mix-blend-mode: color-dodge;
+    }
+
+    /* --- 風格 1: Gold Ultra 奢華黑金浮雕 (預設) --- */
+    .foil-gold-ultra .card-holo {
+      background-image: 
+        radial-gradient(circle at var(--pointer-x, 50%) var(--pointer-y, 50%), rgba(255, 230, 120, 0.9) 0%, transparent 60%),
+        repeating-linear-gradient(
+          calc(var(--pointer-from-left, 0.5) * 120deg + 30deg),
+          rgba(255, 215, 0, 0.6) 0%,
+          rgba(255, 140, 0, 0.3) 12%,
+          rgba(255, 255, 255, 0.85) 15%,
+          rgba(139, 69, 19, 0.2) 25%,
+          rgba(255, 215, 0, 0.6) 35%
+        ),
+        linear-gradient(135deg, rgba(255, 215, 0, 0.4), rgba(255, 69, 0, 0.3));
+      background-size: 150% 150%, 200% 200%, 100% 100%;
+      background-position: var(--pointer-x, 50%) var(--pointer-y, 50%), calc(var(--pointer-from-left, 0.5) * 100%) calc(var(--pointer-from-top, 0.5) * 100%), center;
+      filter: contrast(1.6) brightness(1.2);
+    }
+
+    /* --- 風格 2: Cosmos Holo 宇宙彩虹星塵 --- */
+    .foil-cosmos-holo .card-holo {
+      background-image:
+        radial-gradient(circle at var(--pointer-x, 50%) var(--pointer-y, 50%), rgba(255, 255, 255, 0.9) 0%, transparent 50%),
+        repeating-conic-gradient(
+          from calc(var(--pointer-from-left, 0.5) * 180deg) at var(--pointer-x, 50%) var(--pointer-y, 50%),
+          rgba(255, 0, 0, 0.5) 0deg,
+          rgba(255, 154, 0, 0.5) 30deg,
+          rgba(208, 222, 33, 0.5) 60deg,
+          rgba(79, 220, 74, 0.5) 90deg,
+          rgba(63, 218, 216, 0.5) 120deg,
+          rgba(47, 201, 226, 0.5) 150deg,
+          rgba(28, 127, 238, 0.5) 180deg,
+          rgba(95, 21, 242, 0.5) 210deg,
+          rgba(186, 12, 248, 0.5) 240deg,
+          rgba(251, 7, 217, 0.5) 270deg,
+          rgba(255, 0, 0, 0.5) 360deg
+        ),
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,0.7) 1px, transparent 2px),
+        radial-gradient(circle at 70% 65%, rgba(255,255,255,0.8) 1.5px, transparent 2.5px),
+        radial-gradient(circle at 45% 85%, rgba(255,255,255,0.7) 1px, transparent 2px);
+      background-size: 150% 150%, 250% 250%, 60px 60px, 80px 80px, 50px 50px;
+      mix-blend-mode: color-dodge;
+      filter: contrast(1.7) brightness(1.3);
+    }
+
+    /* --- 風格 3: Rainbow Secret 極光全息稜鏡 --- */
+    .foil-rainbow-secret .card-holo {
+      background-image:
+        linear-gradient(
+          calc(var(--pointer-from-left, 0.5) * 160deg + 20deg),
+          rgba(255, 0, 128, 0.6) 0%,
+          rgba(255, 180, 0, 0.6) 20%,
+          rgba(0, 255, 180, 0.6) 40%,
+          rgba(0, 180, 255, 0.6) 60%,
+          rgba(180, 0, 255, 0.6) 80%,
+          rgba(255, 0, 128, 0.6) 100%
+        ),
+        repeating-linear-gradient(
+          45deg,
+          transparent,
+          transparent 8px,
+          rgba(255, 255, 255, 0.25) 9px,
+          transparent 10px
+        );
+      background-size: 200% 200%, 100% 100%;
+      background-position: calc(var(--pointer-from-left, 0.5) * 100%) calc(var(--pointer-from-top, 0.5) * 100%), center;
+      mix-blend-mode: hard-light;
+      filter: contrast(1.5) saturate(1.4);
+    }
+
+    /* --- 風格 4: Silver Phantom 冷冽銀鏡暗紋 --- */
+    .foil-silver-phantom .card-holo {
+      background-image: 
+        radial-gradient(circle at var(--pointer-x, 50%) var(--pointer-y, 50%), rgba(255, 255, 255, 0.95) 0%, transparent 60%),
+        repeating-linear-gradient(
+          calc(var(--pointer-from-left, 0.5) * 90deg + 45deg),
+          rgba(255, 255, 255, 0.8) 0%,
+          rgba(180, 200, 220, 0.3) 15%,
+          rgba(40, 60, 80, 0.1) 30%,
+          rgba(255, 255, 255, 0.9) 45%,
+          rgba(180, 200, 220, 0.3) 60%
+        );
+      background-size: 150% 150%, 200% 200%;
+      mix-blend-mode: color-dodge;
+      filter: contrast(2) brightness(1.4) grayscale(0.3);
+    }
+
+    /* ==========================================================================
+       7. 卡牌背面結構 (Card Back Design)
+       ========================================================================== */
+    .card-back {
+      z-index: 1;
+      transform: rotateY(180deg);
+      background: radial-gradient(circle at 50% 50%, #290807 0%, #150505 60%, #080202 100%);
+      border: 3px solid #ffd700;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-back-frame {
+      width: 100%;
+      height: 100%;
+      border: 2px solid rgba(255, 215, 0, 0.5);
+      border-radius: 12px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: radial-gradient(circle at center, rgba(139, 0, 0, 0.35) 0%, transparent 70%);
+      box-shadow: inset 0 0 35px rgba(0, 0, 0, 0.9);
+      overflow: hidden;
+    }
+
+    .card-back-symbol {
+      width: 130px;
+      height: 130px;
+      border: 3px solid #ffd700;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 0 25px rgba(255, 215, 0, 0.4), inset 0 0 15px rgba(255, 69, 0, 0.6);
+      animation: rotateBackRunes 25s linear infinite;
+    }
+
+    @keyframes rotateBackRunes {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .card-back-symbol::before {
+      content: '';
+      position: absolute;
+      inset: 8px;
+      border: 1px dashed rgba(255, 215, 0, 0.7);
+      border-radius: 50%;
+    }
+
+    .card-back-icon {
+      font-size: 3.5rem;
+      filter: drop-shadow(0 0 15px #ff5500);
+      animation: counterRotate 25s linear infinite;
+    }
+
+    @keyframes counterRotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(-360deg); }
+    }
+
+    .card-back-title {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 900;
+      letter-spacing: 0.25em;
+      color: #ffd700;
+      margin-top: 1.5rem;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+      text-transform: uppercase;
+    }
+
+    .card-back-sub {
+      font-family: var(--font-tech);
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: #ff9955;
+      margin-top: 0.3rem;
+    }
+
+    /* ==========================================================================
+       8. 右側：磨砂玻璃互動控制面板 (Glassmorphic Inspector)
+       ========================================================================== */
+    .control-panel {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 1.8rem;
+      box-shadow: var(--glass-shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 120, 50, 0.2);
+      padding-bottom: 0.8rem;
+    }
+
+    .panel-title {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #ffd700;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .panel-status {
+      font-family: var(--font-tech);
+      font-size: 0.75rem;
+      color: #00ffaa;
+      background: rgba(0, 255, 170, 0.1);
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid rgba(0, 255, 170, 0.3);
+    }
+
+    /* 控制分區塊 */
+    .control-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .section-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #fce1cb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .section-label small {
+      font-size: 0.72rem;
+      color: #b59885;
+      font-weight: normal;
+    }
+
+    /* 鐳射風格切換按鈕群組 */
+    .style-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.6rem;
+    }
+
+    @media (min-width: 480px) {
+      .style-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .btn-foil-choice {
+      background: rgba(30, 16, 18, 0.8);
+      border: 1px solid rgba(255, 140, 0, 0.25);
+      color: #e6ceba;
+      padding: 0.65rem 0.8rem;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-foil-choice span.choice-en {
+      font-family: var(--font-tech);
+      font-size: 0.65rem;
+      color: #ff9955;
+    }
+
+    .btn-foil-choice:hover {
+      background: rgba(255, 69, 0, 0.2);
+      border-color: rgba(255, 140, 0, 0.6);
+      transform: translateY(-2px);
+    }
+
+    .btn-foil-choice.is-active {
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.25) 0%, rgba(255, 69, 0, 0.3) 100%);
+      border: 1px solid #ffd700;
+      color: #fff;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.35);
+    }
+
+    /* 操作按鈕群組 (翻面、匯出、重置、展示) */
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+
+    .btn-action {
+      background: rgba(45, 20, 22, 0.9);
+      border: 1px solid rgba(255, 100, 30, 0.35);
+      color: #ffd8b8;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      font-family: var(--font-body);
+    }
+
+    .btn-action:hover {
+      background: rgba(255, 69, 0, 0.35);
+      border-color: #ff7733;
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255, 60, 20, 0.3);
+    }
+
+    .btn-action:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ff4500 0%, #b22222 100%);
+      border: 1px solid #ffd700;
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(255, 69, 0, 0.4);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #ff6600 0%, #cc0000 100%);
+      box-shadow: 0 6px 20px rgba(255, 100, 0, 0.6);
+    }
+
+    /* 上傳立繪按鈕與隱藏 input */
+    .upload-container {
+      position: relative;
+    }
+
+    .file-input-hidden {
+      display: none;
+    }
+
+    /* 滑桿控制 (傾斜靈敏度 / 箔膜輝度) */
+    .slider-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .slider-input {
+      flex: 1;
+      accent-color: #ff5500;
+      cursor: pointer;
+    }
+
+    .slider-val {
+      font-family: var(--font-tech);
+      font-size: 0.8rem;
+      color: #ffd700;
+      min-width: 32px;
+      text-align: right;
+    }
+
+    /* 即時提示說明條 */
+    .info-callout {
+      background: rgba(255, 140, 0, 0.08);
+      border-left: 3px solid #ff9900;
+      padding: 0.6rem 0.8rem;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.75rem;
+      color: #d8c2b0;
+      line-height: 1.4;
+    }
+
+    .info-callout strong {
+      color: #ffd700;
+    }
+
+    /* ==========================================================================
+       9. 編輯模式高亮回饋 (contenteditable 樣式)
+       ========================================================================== */
+    [contenteditable="true"] {
+      transition: background 0.2s, box-shadow 0.2s;
+      cursor: text;
+    }
+
+    [contenteditable="true"]:hover {
+      background: rgba(255, 215, 0, 0.15);
+      border-radius: 2px;
+      box-shadow: 0 0 0 1px rgba(255, 215, 0, 0.4);
+    }
+
+    [contenteditable="true"]:focus {
+      background: rgba(255, 215, 0, 0.25);
+      outline: 1.5px solid #ffd700;
+      border-radius: 2px;
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+
+    /* ==========================================================================
+       10. 頁尾資訊
+       ========================================================================== */
+    footer.site-footer {
+      margin-top: 3rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #7d6555;
+      z-index: 2;
+    }
+
+    footer.site-footer a {
+      color: #ff8c00;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body class="foil-gold-ultra">
+
+  <!-- 頂部標題與位階勳章 -->
+  <header class="site-header">
+    <div class="badge-pill">ORIGIN LEGENDARY FORGE ✦ HIGH RESOLUTION TCG</div>
+    <h1 class="site-title">真。光頭王 SSR VII</h1>
+    <p class="site-subtitle">3D 視差與動態雷射反光個人傳奇卡牌 ｜ 支援即時雙向編輯與體感連動</p>
+  </header>
+
+  <!-- 主舞台與面板容器 (RWD: 桌面並排 / 行動堆疊) -->
+  <main class="foundry-container">
+
+    <!-- 左側：3D 卡牌視差舞台 -->
+    <section class="card-stage" id="cardStage">
+      
+      <!-- 3D 卡牌主體 (63:88 標準比例) -->
+      <div class="card-wrapper" id="cardWrapper">
+        <div class="card-inner" id="cardInner">
+
+          <!-- 卡牌正面 (Front Face) -->
+          <article class="card-face card-front" id="cardExportTarget">
+            
+            <!-- 多層全息鐳射箔膜與高光反射層 -->
+            <div class="card-holo" id="cardHoloLayer"></div>
+            <div class="card-glare" id="cardGlareLayer"></div>
+
+            <!-- 內嵌金屬鑲邊結構 -->
+            <div class="card-frame">
+              
+              <!-- 1. 頂部抬頭區：位階、名稱、HP、屬性 -->
+              <div class="card-header-bar">
+                <span class="card-rank-badge" title="卡片位階標記" contenteditable="true" spellcheck="false" id="fieldRank">SSR VII</span>
+                <div class="card-title-group">
+                  <h2 class="card-name" contenteditable="true" spellcheck="false" id="fieldName" title="點擊即可直接修改名稱">真。光頭王</h2>
+                </div>
+                <div class="card-hp-group">
+                  <span class="hp-label">HP</span>
+                  <span class="hp-value" contenteditable="true" spellcheck="false" id="fieldHp" title="點擊即可修改生命值">5000</span>
+                </div>
+                <div class="type-orb" title="核心屬性：火 熔岩紅">🔥</div>
+              </div>
+
+              <!-- 2. 插畫視窗區：FGO 戰士風格立繪與能量輝印 -->
+              <div class="art-viewport" id="artViewport">
+                <!-- 專屬真人英雄立繪 default.JPG (支援大小寫自動適配與備援機制) -->
+                <img class="art-image" id="customArtImg" src="default.JPG" alt="真。光頭王 戰士立繪" onerror="if(!this.dataset.retry){this.dataset.retry='1';this.src='default.jpg';}else{this.style.display='none';document.getElementById('defaultArtSvg').style.display='block';}" />
+
+                <!-- 備援精緻向量熔岩戰士插圖 (當圖檔未就緒時自動切換) -->
+                <svg class="art-image" id="defaultArtSvg" viewBox="0 0 400 320" xmlns="http://www.w3.org/2000/svg" style="display:none;">
+                  <defs>
+                    <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#180402" />
+                      <stop offset="50%" stop-color="#3d0a06" />
+                      <stop offset="100%" stop-color="#701208" />
+                    </linearGradient>
+                    <radialGradient id="sunGlow" cx="50%" cy="30%" r="50%">
+                      <stop offset="0%" stop-color="#fff2a8" stop-opacity="1" />
+                      <stop offset="30%" stop-color="#ff7b00" stop-opacity="0.8" />
+                      <stop offset="70%" stop-color="#b81400" stop-opacity="0.3" />
+                      <stop offset="100%" stop-color="transparent" stop-opacity="0" />
+                    </radialGradient>
+                    <linearGradient id="bladeGrad" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stop-color="#ffffff" />
+                      <stop offset="30%" stop-color="#ffd700" />
+                      <stop offset="70%" stop-color="#ff4500" />
+                      <stop offset="100%" stop-color="#4a0000" />
+                    </linearGradient>
+                    <linearGradient id="armorGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#3a221a" />
+                      <stop offset="50%" stop-color="#1f0f0c" />
+                      <stop offset="100%" stop-color="#0d0403" />
+                    </linearGradient>
+                  </defs>
+                  
+                  <!-- 背景熔岩烈焰天空 -->
+                  <rect width="400" height="320" fill="url(#skyGrad)" />
+                  <circle cx="200" cy="110" r="130" fill="url(#sunGlow)" />
+                  
+                  <!-- 遠景召喚法陣與流星光斑 -->
+                  <circle cx="200" cy="110" r="85" fill="none" stroke="#ffd700" stroke-width="1.5" stroke-dasharray="4,6" opacity="0.4" />
+                  <circle cx="200" cy="110" r="70" fill="none" stroke="#ff4500" stroke-width="1" opacity="0.3" />
+                  
+                  <!-- 巨型德瑪西亞烈焰聖劍 (背景交錯) -->
+                  <path d="M 235 20 L 255 35 L 210 260 L 195 250 Z" fill="url(#bladeGrad)" filter="drop-shadow(0 0 10px #ff6600)" />
+                  <path d="M 215 15 L 235 28 L 205 180 Z" fill="#ffffff" opacity="0.8" />
+                  <!-- 劍鍔黃金雕紋 -->
+                  <polygon points="230,190 270,205 240,218 200,200" fill="#ffd700" />
+
+                  <!-- 真。光頭王 戰士雄偉剪影與黃金熔岩重鎧 -->
+                  <!-- 披風背飾 -->
+                  <path d="M 120 180 Q 90 280 140 320 Q 200 300 280 320 Q 300 240 270 180 Z" fill="#880e04" opacity="0.85" />
+                  <path d="M 130 190 Q 105 270 150 310" stroke="#ff8800" stroke-width="2" fill="none" opacity="0.6" />
+
+                  <!-- 重型熔岩肩鎧 (黑金邊飾與烈焰裂紋) -->
+                  <path d="M 115 170 L 165 145 L 175 195 L 125 215 Z" fill="url(#armorGrad)" stroke="#ffd700" stroke-width="2" />
+                  <path d="M 225 145 L 280 170 L 270 215 L 215 195 Z" fill="url(#armorGrad)" stroke="#ffd700" stroke-width="2" />
+                  <!-- 熔岩發光脈絡 -->
+                  <path d="M 135 165 Q 150 180 145 200" stroke="#ff3b14" stroke-width="2" fill="none" filter="drop-shadow(0 0 4px #ff3b14)" />
+                  <path d="M 260 165 Q 245 180 250 200" stroke="#ff3b14" stroke-width="2" fill="none" filter="drop-shadow(0 0 4px #ff3b14)" />
+
+                  <!-- 胸甲與戰士之軀 -->
+                  <path d="M 160 160 L 240 160 L 230 270 L 170 270 Z" fill="url(#armorGrad)" stroke="#ffaa00" stroke-width="1.5" />
+                  <polygon points="200,175 220,210 200,230 180,210" fill="#ffd700" opacity="0.9" />
+
+                  <!-- 光頭王 威武頭部與英魂金芒 (象徵頂級強者之無暇光頭) -->
+                  <ellipse cx="200" cy="115" rx="36" ry="44" fill="#eed5b8" />
+                  <!-- 光頭反光特寫高光 (頂級強者無毛之證明) -->
+                  <ellipse cx="192" cy="95" rx="14" ry="10" fill="#ffffff" opacity="0.75" />
+                  <ellipse cx="205" cy="90" rx="6" ry="4" fill="#ffffff" opacity="0.9" />
+                  
+                  <!-- 堅毅面容神韻 (FGO 戰士風格英氣雙目與戰意) -->
+                  <path d="M 183 118 L 195 121" stroke="#22110c" stroke-width="3" stroke-linecap="round" />
+                  <path d="M 205 121 L 217 118" stroke="#22110c" stroke-width="3" stroke-linecap="round" />
+                  <ellipse cx="189" cy="126" rx="4" ry="3.5" fill="#22110c" />
+                  <ellipse cx="211" cy="126" rx="4" ry="3.5" fill="#22110c" />
+                  <!-- 目中戰意燃燒金芒 -->
+                  <circle cx="190" cy="125" r="1.5" fill="#ffd700" />
+                  <circle cx="212" cy="125" r="1.5" fill="#ffd700" />
+                  <path d="M 197 125 L 200 137 L 203 125" fill="#c49a78" />
+                  <path d="M 192 144 Q 200 148 208 144" stroke="#22110c" stroke-width="2.5" fill="none" />
+
+                  <!-- 頂級戰士之霸王火花與漂浮燼火 -->
+                  <circle cx="150" cy="80" r="3" fill="#ffd700" opacity="0.8" />
+                  <circle cx="260" cy="95" r="2.5" fill="#ff4500" opacity="0.8" />
+                  <circle cx="130" cy="130" r="2" fill="#ffd700" opacity="0.9" />
+                  <circle cx="270" cy="140" r="3.5" fill="#ff7700" opacity="0.85" />
+                  <circle cx="170" cy="50" r="2" fill="#ffffff" opacity="0.9" />
+                </svg>
+
+                <div class="art-overlay-gradient"></div>
+                <div class="art-class-emblem">FGO SABER / SSR</div>
+              </div>
+
+              <!-- 3. 能力與招式區塊 (Moves & Passive) -->
+              <div class="card-skills-section">
+                
+                <!-- 被動特性：堅韌意志 -->
+                <div class="skill-trait">
+                  <div class="trait-header">
+                    <span class="trait-tag">特性</span>
+                    <span class="trait-name" contenteditable="true" spellcheck="false" id="fieldTraitName">堅韌意志（毅勇再生）</span>
+                  </div>
+                  <p class="trait-desc" contenteditable="true" spellcheck="false" id="fieldTraitDesc">
+                    如果光頭王近期內未受到傷害或是被敵人的技能影響的話，每秒將會回復一定比例的總生命。
+                  </p>
+                </div>
+
+                <!-- 招式一：致命打擊 -->
+                <div class="skill-attack">
+                  <div class="attack-header">
+                    <div class="attack-meta">
+                      <div class="energy-cost">
+                        <span class="energy-dot energy-fire">🔥</span>
+                        <span class="energy-dot energy-fire">🔥</span>
+                      </div>
+                      <span class="attack-name" contenteditable="true" spellcheck="false" id="fieldAtk1Name">致命打擊</span>
+                    </div>
+                    <span class="attack-dmg" contenteditable="true" spellcheck="false" id="fieldAtk1Dmg">850</span>
+                  </div>
+                  <p class="attack-desc" contenteditable="true" spellcheck="false" id="fieldAtk1Desc">
+                    光頭王的跑速獲得大量提升，並解除身上的所有緩速效果。他的下一次普攻會重傷敵人，造成額外傷害並將其沉默。
+                  </p>
+                </div>
+
+                <!-- 奧義技能：德瑪西亞的制裁 -->
+                <div class="skill-ultimate">
+                  <div class="ultimate-title-wrap">
+                    <div class="energy-cost">
+                      <span class="energy-dot energy-fire">🔥</span>
+                      <span class="energy-dot energy-fire">🔥</span>
+                      <span class="energy-dot energy-fire">🔥</span>
+                      <span class="energy-dot energy-colorless">⚪</span>
+                    </div>
+                    <span class="ultimate-name" contenteditable="true" spellcheck="false" id="fieldUltName">德瑪西亞的制裁</span>
+                    <span class="ultimate-dmg" contenteditable="true" spellcheck="false" id="fieldUltDmg">3500+</span>
+                  </div>
+                  <p class="ultimate-desc" contenteditable="true" spellcheck="false" id="fieldUltDesc">
+                    光頭王召喚蒂瑪西亞之力，試圖處決一名敵方英雄。目標失去的生命值越多，造成的斬殺真實傷害越高。
+                  </p>
+                </div>
+
+              </div>
+
+              <!-- 4. 對抗與調度機制 (戰士視角：弱點、抗性、撤退) -->
+              <div class="card-combat-stats">
+                <div class="stat-box">
+                  <span class="stat-title">弱點 (Weakness)</span>
+                  <span class="stat-value" contenteditable="true" spellcheck="false" id="fieldWeakness">魔法/控場 ×2</span>
+                </div>
+                <div class="stat-box">
+                  <span class="stat-title">抗性 (Resistance)</span>
+                  <span class="stat-value" contenteditable="true" spellcheck="false" id="fieldResistance">物理重擊 -60</span>
+                </div>
+                <div class="stat-box">
+                  <span class="stat-title">調度成本 (Retreat)</span>
+                  <span class="stat-value" contenteditable="true" spellcheck="false" id="fieldRetreat">⚪⚪⚪ (重裝)</span>
+                </div>
+              </div>
+
+              <!-- 5. 專屬防偽與認證印記 -->
+              <div class="card-footer-bar">
+                <div class="footer-left">
+                  <span class="illus-name" contenteditable="true" spellcheck="false" id="fieldIllus">Illus. Richard.</span>
+                  <span class="card-copyright" contenteditable="true" spellcheck="false" id="fieldCopyright">© 2026 NextWorks. All Rights Reserved.</span>
+                </div>
+                <div class="footer-right">
+                  <span class="card-serial" contenteditable="true" spellcheck="false" id="fieldSerial">No. 007 SSR</span>
+                  <span class="hologram-seal" title="官方認證雷射防偽標章"></span>
+                </div>
+              </div>
+
+            </div>
+          </article>
+
+          <!-- 卡牌背面 (Back Face - 180° 翻轉呈現) -->
+          <div class="card-face card-back">
+            <div class="card-back-frame">
+              <div class="card-back-symbol">
+                <div class="card-back-icon">⚔️</div>
+              </div>
+              <div class="card-back-title">LEGENDARY FORGE</div>
+              <div class="card-back-sub">SSR MASTER ARCHIVE ✦ TCG</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 舞台底座光斑投影 -->
+      <div class="stage-pedestal" id="stagePedestal"></div>
+    </section>
+
+    <!-- 右側：磨砂玻璃互動控制面板 -->
+    <aside class="control-panel">
+      
+      <div class="panel-header">
+        <h3 class="panel-title">
+          <span>⚙️</span> 卡牌鍛造工坊控制台
+        </h3>
+        <span class="panel-status" id="interactionStatus">3D 視差已連動</span>
+      </div>
+
+      <!-- 控制項 1: 全息鐳射箔膜風格切換器 -->
+      <div class="control-section">
+        <label class="section-label">
+          <span>全息鐳射箔膜風格 (Foil Style)</span>
+          <small>即時光學渲染</small>
+        </label>
+        <div class="style-grid">
+          <button class="btn-foil-choice is-active" data-foil="foil-gold-ultra">
+            <span>黑金浮雕 (預設)</span>
+            <span class="choice-en">Gold Ultra</span>
+          </button>
+          <button class="btn-foil-choice" data-foil="foil-cosmos-holo">
+            <span>宇宙星塵彩虹</span>
+            <span class="choice-en">Cosmos Holo</span>
+          </button>
+          <button class="btn-foil-choice" data-foil="foil-rainbow-secret">
+            <span>極光全息稜鏡</span>
+            <span class="choice-en">Rainbow Secret</span>
+          </button>
+          <button class="btn-foil-choice" data-foil="foil-silver-phantom">
+            <span>冷冽銀鏡暗紋</span>
+            <span class="choice-en">Silver Phantom</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 控制項 2: 插畫圖片自訂上傳 -->
+      <div class="control-section">
+        <label class="section-label">
+          <span>更換角色立繪 (Custom Artwork)</span>
+          <small>支援 本機 JPG / PNG / WebP</small>
+        </label>
+        <div class="upload-container">
+          <input type="file" id="imageFileInput" class="file-input-hidden" accept="image/*">
+          <button class="btn-action" id="btnUploadImage" style="width: 100%;">
+            <span>🖼️</span> 上傳個人肖像／全新插畫圖檔
+          </button>
+        </div>
+      </div>
+
+      <!-- 控制項 3: 3D 視差與動態效果控制 -->
+      <div class="control-section">
+        <label class="section-label">
+          <span>視差傾角靈敏度 (Tilt Multiplier)</span>
+          <span class="slider-val" id="tiltValDisplay">22°</span>
+        </label>
+        <div class="slider-row">
+          <input type="range" class="slider-input" id="sliderTilt" min="5" max="35" value="22">
+        </div>
+      </div>
+
+      <!-- 控制項 4: 快捷動作群組 -->
+      <div class="control-section">
+        <label class="section-label">
+          <span>卡牌動作與匯出 (Actions)</span>
+          <small>免建置零依賴</small>
+        </label>
+        <div class="action-grid">
+          <button class="btn-action" id="btnFlipCard">
+            <span>🔄</span> 3D 翻轉卡背
+          </button>
+          <button class="btn-action" id="btnAutoRotate">
+            <span>✨</span> 自動巡航展示
+          </button>
+          <button class="btn-action" id="btnResetTilt">
+            <span>🎯</span> 視角正位回彈
+          </button>
+          <button class="btn-action btn-primary" id="btnExportPng">
+            <span>📥</span> 匯出高解析 PNG
+          </button>
+        </div>
+      </div>
+
+      <!-- 說明指引 -->
+      <div class="info-callout">
+        💡 <strong>卡面即時修改指引</strong>：卡面上的<strong>名稱、生命值、位階、特性描述、招式威力、弱點抗性與創作者署名</strong>皆已啟用即時編輯功能，直接以滑鼠或手指點擊卡面文字即可鍵入修改！
+      </div>
+
+    </aside>
+
+  </main>
+
+  <!-- 頁尾宣告 -->
+  <footer class="site-footer">
+    <p>傳奇卡牌工坊 ｜ Crafted for <strong>真。光頭王</strong> ｜ Powered by Vanilla Web Standards &amp; CSS 3D Transforms</p>
+  </footer>
+
+  <!-- ==========================================================================
+       11. 3D 物理引擎、鐳射光學渲染、陀螺儀與事件控制器 (Vanilla JavaScript)
+       ========================================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      // --- DOM 節點快取 ---
+      const wrapper = document.getElementById('cardWrapper');
+      const inner = document.getElementById('cardInner');
+      const holoLayer = document.getElementById('cardHoloLayer');
+      const glareLayer = document.getElementById('cardGlareLayer');
+      const stage = document.getElementById('cardStage');
+      const pedestal = document.getElementById('stagePedestal');
+      const statusText = document.getElementById('interactionStatus');
+
+      // 控制面板按鈕
+      const foilButtons = document.querySelectorAll('.btn-foil-choice');
+      const btnFlip = document.getElementById('btnFlipCard');
+      const btnAuto = document.getElementById('btnAutoRotate');
+      const btnReset = document.getElementById('btnResetTilt');
+      const btnExport = document.getElementById('btnExportPng');
+      const btnUpload = document.getElementById('btnUploadImage');
+      const fileInput = document.getElementById('imageFileInput');
+      const customImg = document.getElementById('customArtImg');
+      const defaultSvg = document.getElementById('defaultArtSvg');
+      const sliderTilt = document.getElementById('sliderTilt');
+      const tiltValDisplay = document.getElementById('tiltValDisplay');
+
+      // --- 物理運算狀態變數 ---
+      let maxTilt = 22; // 最大傾斜角（度）
+      let isHovered = false;
+      let isAutoRotating = false;
+      let autoRotateFrameId = null;
+      let autoAngle = 0;
+
+      // 平滑緩動 (LERP) 座標
+      let currentRotateX = 0;
+      let currentRotateY = 0;
+      let targetRotateX = 0;
+      let targetRotateY = 0;
+      let targetGlareX = 50;
+      let targetGlareY = 50;
+      let currentGlareX = 50;
+      let currentGlareY = 50;
+      let targetOpacity = 0;
+      let currentOpacity = 0;
+
+      // 1. 核心渲染循環 (requestAnimationFrame 平滑插值)
+      function renderLoop() {
+        if (isAutoRotating) {
+          // 自動展示巡航模式：8 字形迴旋傾斜
+          autoAngle += 0.035;
+          targetRotateY = Math.sin(autoAngle) * (maxTilt * 0.85);
+          targetRotateX = Math.cos(autoAngle * 0.8) * (maxTilt * 0.55);
+          targetGlareX = 50 + Math.sin(autoAngle) * 35;
+          targetGlareY = 50 + Math.cos(autoAngle * 0.8) * 35;
+          targetOpacity = 0.95;
+        }
+
+        // LERP 插值運算，帶來細膩的物理重力與阻尼感
+        currentRotateX += (targetRotateX - currentRotateX) * 0.12;
+        currentRotateY += (targetRotateY - currentRotateY) * 0.12;
+        currentGlareX += (targetGlareX - currentGlareX) * 0.15;
+        currentGlareY += (targetGlareY - currentGlareY) * 0.15;
+        currentOpacity += (targetOpacity - currentOpacity) * 0.12;
+
+        // 套用 CSS 3D Transform 傾角
+        wrapper.style.transform = `rotateX(${currentRotateX.toFixed(2)}deg) rotateY(${currentRotateY.toFixed(2)}deg)`;
+
+        // 更新鐳射反光與光斑的 CSS 自訂屬性
+        const fromLeft = (currentGlareX / 100).toFixed(3);
+        const fromTop = (currentGlareY / 100).toFixed(3);
+
+        wrapper.style.setProperty('--pointer-x', `${currentGlareX.toFixed(1)}%`);
+        wrapper.style.setProperty('--pointer-y', `${currentGlareY.toFixed(1)}%`);
+        wrapper.style.setProperty('--pointer-from-left', fromLeft);
+        wrapper.style.setProperty('--pointer-from-top', fromTop);
+        wrapper.style.setProperty('--card-opacity', currentOpacity.toFixed(3));
+
+        // 舞台底座陰影動態聯動
+        if (pedestal) {
+          const shadowOffsetX = (-currentRotateY * 1.5).toFixed(1);
+          pedestal.style.transform = `translateX(${shadowOffsetX}px) scale(${1 + currentOpacity * 0.15})`;
+          pedestal.style.opacity = (0.5 + currentOpacity * 0.5).toFixed(2);
+        }
+
+        requestAnimationFrame(renderLoop);
+      }
+      requestAnimationFrame(renderLoop);
+
+      // 2. 游標與指標互動計算 (Pointer Tracking)
+      function handlePointerMove(e) {
+        if (isAutoRotating) stopAutoRotate();
+        isHovered = true;
+
+        const rect = wrapper.getBoundingClientRect();
+        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+
+        if (!clientX || !clientY) return;
+
+        // 計算游標在卡牌內的相對比例 (-1 到 +1)
+        const xRel = (clientX - rect.left) / rect.width;
+        const yRel = (clientY - rect.top) / rect.height;
+
+        const clampedX = Math.max(0, Math.min(1, xRel));
+        const clampedY = Math.max(0, Math.min(1, yRel));
+
+        // 轉換為 3D 旋轉角度 (X 軸傾角對應 Y 軸移動，反向)
+        targetRotateY = (clampedX - 0.5) * (maxTilt * 2);
+        targetRotateX = -(clampedY - 0.5) * (maxTilt * 2);
+
+        // 鐳射光斑百分比
+        targetGlareX = clampedX * 100;
+        targetGlareY = clampedY * 100;
+        targetOpacity = 1.0;
+      }
+
+      function handlePointerLeave() {
+        if (isAutoRotating) return;
+        isHovered = false;
+        targetRotateX = 0;
+        targetRotateY = 0;
+        targetOpacity = 0;
+      }
+
+      // 綁定桌面與觸控事件
+      wrapper.addEventListener('pointermove', handlePointerMove);
+      wrapper.addEventListener('pointerenter', () => { isHovered = true; });
+      wrapper.addEventListener('pointerleave', handlePointerLeave);
+
+      // 行動端觸控事件支援
+      wrapper.addEventListener('touchmove', (e) => {
+        handlePointerMove(e);
+      }, { passive: true });
+
+      wrapper.addEventListener('touchend', handlePointerLeave);
+
+      // 3. 陀螺儀動態傾斜感應 (行動裝置 DeviceOrientation)
+      let gyroSupported = false;
+      function handleOrientation(e) {
+        if (isHovered || isAutoRotating) return;
+        const gamma = e.gamma; // 左右傾斜 (-90 到 90)
+        const beta = e.beta;   // 前後傾斜 (-180 到 180)
+
+        if (gamma !== null && beta !== null) {
+          if (!gyroSupported) {
+            gyroSupported = true;
+            statusText.textContent = '陀螺儀體感連動中';
+          }
+          // 將重力加速度角度映射至安全旋轉範圍
+          const clampedGamma = Math.max(-30, Math.min(30, gamma));
+          const clampedBeta = Math.max(10, Math.min(60, beta)) - 35; // 預設 35 度持握視角
+
+          targetRotateY = (clampedGamma / 30) * maxTilt;
+          targetRotateX = -(clampedBeta / 25) * maxTilt;
+
+          targetGlareX = 50 + (targetRotateY / maxTilt) * 40;
+          targetGlareY = 50 - (targetRotateX / maxTilt) * 40;
+          targetOpacity = 0.85;
+        }
+      }
+
+      if (window.DeviceOrientationEvent) {
+        window.addEventListener('deviceorientation', handleOrientation);
+      }
+
+      // 4. 鐳射風格切換 (Foil Style Switcher)
+      foilButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          foilButtons.forEach(b => b.classList.remove('is-active'));
+          btn.classList.add('is-active');
+
+          const foilClass = btn.getAttribute('data-foil');
+          document.body.className = '';
+          document.body.classList.add(foilClass);
+
+          // 視覺反饋脈衝
+          targetOpacity = 1.0;
+        });
+      });
+
+      // 5. 翻轉卡背按鈕
+      btnFlip.addEventListener('click', () => {
+        wrapper.classList.toggle('is-flipped');
+        const isFlipped = wrapper.classList.contains('is-flipped');
+        btnFlip.innerHTML = isFlipped ? '<span>🔄</span> 翻回卡牌正面' : '<span>🔄</span> 3D 翻轉卡背';
+      });
+
+      // 6. 自動巡航展示模式 (Auto-Orbit)
+      function startAutoRotate() {
+        isAutoRotating = true;
+        btnAuto.innerHTML = '<span>⏸️</span> 暫停巡航展示';
+        btnAuto.classList.add('btn-primary');
+        statusText.textContent = '自動巡航展示中';
+      }
+
+      function stopAutoRotate() {
+        isAutoRotating = false;
+        btnAuto.innerHTML = '<span>✨</span> 自動巡航展示';
+        btnAuto.classList.remove('btn-primary');
+        statusText.textContent = '3D 視差已連動';
+        targetRotateX = 0;
+        targetRotateY = 0;
+        targetOpacity = 0;
+      }
+
+      btnAuto.addEventListener('click', () => {
+        if (isAutoRotating) {
+          stopAutoRotate();
+        } else {
+          startAutoRotate();
+        }
+      });
+
+      // 7. 視角正位回彈
+      btnReset.addEventListener('click', () => {
+        stopAutoRotate();
+        targetRotateX = 0;
+        targetRotateY = 0;
+        targetOpacity = 0;
+      });
+
+      // 8. 傾角靈敏度調整
+      sliderTilt.addEventListener('input', (e) => {
+        maxTilt = parseInt(e.target.value, 10);
+        tiltValDisplay.textContent = `${maxTilt}°`;
+      });
+
+      // 9. 本機插畫上傳預覽 (FileReader API)
+      btnUpload.addEventListener('click', () => {
+        fileInput.click();
+      });
+
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            customImg.src = event.target.result;
+            customImg.style.display = 'block';
+            defaultSvg.style.display = 'none';
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // 10. 高解析度 PNG 匯出功能 (html2canvas)
+      btnExport.addEventListener('click', async () => {
+        const target = document.getElementById('cardExportTarget');
+        const originalText = btnExport.innerHTML;
+        btnExport.disabled = true;
+        btnExport.innerHTML = '<span>⏳</span> 正在鍛造導出圖檔...';
+
+        // 暫停即時反光以便拍出純淨高清卡面
+        const prevOpacity = wrapper.style.getPropertyValue('--card-opacity');
+        wrapper.style.setProperty('--card-opacity', '0');
+
+        try {
+          const canvas = await html2canvas(target, {
+            scale: 3, // 3 倍超高採樣率
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: null,
+            logging: false
+          });
+
+          // 觸發下載
+          const dataUrl = canvas.toDataURL('image/png');
+          const link = document.createElement('a');
+          link.download = '真_光頭王_SSR_VII_傳奇卡牌.png';
+          link.href = dataUrl;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } catch (err) {
+          console.error('卡牌圖檔匯出失敗:', err);
+          alert('圖檔匯出遇到問題，請稍候重試或檢查圖片授權。');
+        } finally {
+          wrapper.style.setProperty('--card-opacity', prevOpacity);
+          btnExport.disabled = false;
+          btnExport.innerHTML = originalText;
+        }
+      });
+
+      // 11. 卡面文字即時編輯快捷輔助 (防止 Enter 鍵破壞單行佈局)
+      const singleLineIds = ['fieldName', 'fieldHp', 'fieldRank', 'fieldTraitName', 'fieldAtk1Name', 'fieldAtk1Dmg', 'fieldUltName', 'fieldUltDmg', 'fieldWeakness', 'fieldResistance', 'fieldRetreat', 'fieldIllus', 'fieldSerial'];
+      singleLineIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              el.blur();
+            }
+          });
+        }
+      });
+
+    })();
+  </script>
+</body>
+</html>
